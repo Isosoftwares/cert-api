@@ -314,6 +314,7 @@ const deleteClient = async (req, res) => {
   }
 };
 
+
 const updateUserDocs = async (req, res) => {
   const { clientId } = req.body;
 
