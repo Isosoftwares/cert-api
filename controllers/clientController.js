@@ -13,12 +13,11 @@ const createClient = async (req, res) => {
       firstName,
       lastName,
       middleName,
-      phoneNo,
+      slug,
       certification,
       courseDescription,
       courseHours,
       issuedOn,
-      expiresOn,
       modules,
       blockChainId,
       status,
@@ -36,16 +35,25 @@ const createClient = async (req, res) => {
       });
     }
 
+    const slugDup = await Client.findOne({
+      slug: { $regex: slug, $options: "i" },
+    })
+      .lean()
+      .exec();
+    if (slugDup) {
+      return res.status(409).json({ message: "Slug string already exists" });
+    }
+
     // Create client object
     const clientObject = {
       firstName,
       lastName,
       middleName,
+      slug,
       certification,
       courseDescription,
       courseHours,
       issuedOn: issuedOn ? new Date(issuedOn) : undefined,
-      expiresOn: expiresOn ? new Date(expiresOn) : "Does not expire",
       modules,
       blockChainId,
       status: status || "Active",
@@ -153,13 +161,8 @@ const getClientById = async (req, res) => {
   if (!clientId)
     return res.status(400).json({ message: "Client ID is required" });
 
-  // Validate clientId
-  if (!mongoose.Types.ObjectId.isValid(clientId)) {
-    return res.status(400).json({ message: "Invalid client ID" });
-  }
-
   try {
-    const client = await Client.findById(clientId)
+    const client = await Client.findOne({slug: clientId})
       .select("-password -refreshToken -emailToken")
       .lean()
       .exec();
@@ -195,9 +198,9 @@ const updateClient = async (req, res) => {
       certification,
       courseHours,
       modules,
+      slug,
       blockChainId,
       courseDescription,
-      issuedOn,
       expiresOn,
       lastUpdatedBy,
       status,
@@ -214,9 +217,9 @@ const updateClient = async (req, res) => {
       certification,
       courseHours,
       modules,
+      slug,
       blockChainId,
       courseDescription,
-      issuedOn,
       graphData: {
         marks: marks,
         description: description,
@@ -227,10 +230,6 @@ const updateClient = async (req, res) => {
       updatedAt: new Date(),
     };
 
-    // Only add expiresOn if it exists
-    if (expiresOn) {
-      updateData.expiresOn = expiresOn;
-    }
 
     // Handle file uploads
     if (req.files) {
@@ -313,7 +312,6 @@ const deleteClient = async (req, res) => {
     });
   }
 };
-
 
 const updateUserDocs = async (req, res) => {
   const { clientId } = req.body;

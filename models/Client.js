@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
       required: false,
     },
 
+    slug: {
+      type: String,
+      required: false,
+    },
     phoneNo: {
       type: String,
       required: false,
