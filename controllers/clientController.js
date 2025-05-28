@@ -207,7 +207,10 @@ const updateClient = async (req, res) => {
       marks,
       description,
       average,
+      issuedOn
     } = req.body;
+
+console.log(issuedOn);
 
     // Build update object
     const updateData = {
@@ -218,6 +221,7 @@ const updateClient = async (req, res) => {
       courseHours,
       modules,
       slug,
+      issuedOn: issuedOn ? new Date(issuedOn) : undefined,
       blockChainId,
       courseDescription,
       graphData: {
