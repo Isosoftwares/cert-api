@@ -19,14 +19,7 @@ mongoose.set("strictQuery", true);
 connectDB();
 
 app.use(cors(corsOptions));
-
-app.use(
-  cors({
-    origin: { allowedOrigins },
-    credentials: true,
-    methods: ["POST", "PUT", "GET", "PATCH", "OPTIONS", "HEAD", "DELETE"],
-  })
-);
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(bodyParser.json());
